@@ -13,11 +13,24 @@ server.get("/curso/:index", (req, res) => {
 
 })
 
+const checkName = (req, res, next) => {
+  if (!req.body.nome) {
+    return res.status(400).json({ error: "Nome do curso é obrigatório" })
+  }
 
+  return next();
+}
+
+const checkIndex = (req, res, next) => {
+  if (!cursos[req.params.index]) {
+    return res.status(400).json({ error: "O curso não existe!!" })
+  }
+  return next()
+}
 
 // criar curso
 
-server.post("/curso", (req, res) => {
+server.post("/curso", checkName, (req, res) => {
   const { nome } = req.body;
   cursos.push(nome);
 
@@ -32,7 +45,7 @@ server.get("/curso", (req, res) => {
 
 
 // atualizar um curso
-server.put("/curso/:index", (req, res) => {
+server.put("/curso/:index", checkIndex, checkName, (req, res) => {
   const { index } = req.params;
   const { nome } = req.body;
   cursos[index] = nome;
@@ -42,7 +55,7 @@ server.put("/curso/:index", (req, res) => {
 
 // deletar Curso
 
-server.delete("/curso/:index", (req, res) => {
+server.delete("/curso/:index", checkIndex, (req, res) => {
   const { index } = req.params;
   cursos.slice(index, 1);
 
